@@ -6,9 +6,12 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import AuthScreen from "./(auth)";
+
+import { StatusBar } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -33,12 +36,21 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        {/* Ensure this line is commented out */}
+        {/* <Stack.Screen name="(auth)/index" /> */}
+
+        {/* Ensure this line is active */}
+        <Stack.Screen name="(auth)/fillProfile" />
+
+        {/* <Stack.Screen name="(tabs)" /> */}
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar style="auto" />
+      {/* <StatusBar barStyle={"default"} /> */}
     </ThemeProvider>
   );
 }

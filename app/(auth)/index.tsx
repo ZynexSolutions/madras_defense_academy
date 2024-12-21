@@ -4,10 +4,21 @@ import { OpacityButton } from "@/components/OpacityButton";
 import { SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import styles from "@/styles/authStyles";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
-export default function LoginScreen() {
+export default function AuthScreen() {
+  const router = useRouter();
+
+  function redirectToSignIn() {
+    router.push("/(auth)/signin");
+  }
+
+  function redirectToSignUp() {
+    router.push("/(auth)/signup");
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.topSection}>
@@ -44,10 +55,7 @@ export default function LoginScreen() {
 
         <Text style={styles.orText}>( Or )</Text>
 
-        <OpacityButton
-          onPress={() => console.log("Sign in with Your Account")}
-          style={styles.signInButton}
-        >
+        <OpacityButton onPress={redirectToSignIn} style={styles.signInButton}>
           <View style={styles.buttonContent}>
             <Text style={styles.signInButtonText}>
               Sign In with Your Account
@@ -66,10 +74,7 @@ export default function LoginScreen() {
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>
             Don't have an Account?{" "}
-            <Text
-              style={styles.signUpLink}
-              onPress={() => console.log("Sign Up pressed")}
-            >
+            <Text style={styles.signUpLink} onPress={redirectToSignUp}>
               Sign Up
             </Text>
           </Text>
