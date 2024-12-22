@@ -43,7 +43,7 @@ const AuthScreen = () => {
             </View>
           </OpacityButton>
           <OpacityButton
-            onPress={() => console.log("Continue with Apple")}
+            onPress={() => router.push("/(main)")}
             style={styles.authButton}
           >
             <View style={styles.buttonContent}>
