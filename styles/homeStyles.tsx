@@ -10,8 +10,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    marginTop: 20,
-    marginBottom: 10,
+    marginVertical: 28,
   },
   headerText: {},
   title: {
@@ -31,6 +30,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 20,
+    gap: 4,
   },
   searchInputContainer: {
     flex: 1,
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   banner: {
     backgroundColor: "#146EF2",
     borderRadius: 16,
-    padding: 20,
+    padding: 24,
   },
   bannerTitle: {
     fontSize: 14,
@@ -106,8 +106,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  seeAllButton: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 3,
+  },
   seeAll: {
     color: "#146EF2",
+    fontWeight: "bold",
     fontSize: 14,
   },
   categoryButton: {
@@ -130,7 +137,7 @@ const styles = StyleSheet.create({
   courseCard: {
     backgroundColor: "white",
     borderRadius: 16,
-    marginRight: 10,
+    marginRight: 14,
     width: 200,
   },
   courseImage: {
@@ -194,6 +201,7 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    marginBottom: 8,
   },
   mainCategories: {
     flexDirection: "row",
@@ -204,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 10,
     flex: 1,
-    marginRight: 10,
+    marginRight: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -234,7 +242,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   mentorCard: {
-    marginRight: 10,
+    marginRight: 14,
     alignItems: "center",
   },
   mentorImage: {

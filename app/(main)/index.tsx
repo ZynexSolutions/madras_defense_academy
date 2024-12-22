@@ -10,12 +10,8 @@ import {
 import styles from "@/styles/homeStyles";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import Placeholder from "@/components/Placeholder";
-import { OpacityButton } from "@/components/OpacityButton";
 
 import { Image } from "expo-image";
-
-const { width } = Dimensions.get("window");
 
 const categories = ["All", "Category 1", "Category 2", "Category 3"];
 const courses = [
@@ -94,15 +90,16 @@ export default function HomeScreen() {
         </View>
         <View style={styles.popularCourses}>
           <View style={styles.popularCoursesHeader}>
-            <Text style={styles.popularCoursesTitle}>Polupar Courses</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>SEE ALL {">"}</Text>
+            <Text style={styles.popularCoursesTitle}>Popular Courses</Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAll}>View All</Text>
+              <Feather name="chevron-right" size={16} color="#146EF2" />
             </TouchableOpacity>
           </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ marginTop: 10, paddingLeft: 10 }}
+            style={{ marginVertical: 10 }}
           >
             {categories.map((category, index) => (
               <TouchableOpacity
@@ -127,12 +124,12 @@ export default function HomeScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ marginTop: 10, paddingLeft: 10 }}
+            style={{ marginTop: 10 }}
           >
             {courses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
-                  source={require("/assets/images/home/course.png")}
+                  source={require("../../assets/images/home/course.png")}
                   style={styles.courseImage}
                 />
                 <View style={styles.courseDetails}>
@@ -164,8 +161,9 @@ export default function HomeScreen() {
         <View style={styles.categoriesContainer}>
           <View style={styles.categoriesHeader}>
             <Text style={styles.categoriesTitle}>Categories</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>SEE ALL {">"}</Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAll}>View All</Text>
+              <Feather name="chevron-right" size={16} color="#146EF2" />
             </TouchableOpacity>
           </View>
           <View style={styles.mainCategories}>
@@ -182,8 +180,9 @@ export default function HomeScreen() {
         <View style={styles.topMentors}>
           <View style={styles.topMentorsHeader}>
             <Text style={styles.topMentorsTitle}>Top Mentor</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAll}>SEE ALL {">"}</Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAll}>View All</Text>
+              <Feather name="chevron-right" size={16} color="#146EF2" />
             </TouchableOpacity>
           </View>
           <ScrollView
@@ -194,7 +193,7 @@ export default function HomeScreen() {
             {topMentors.map((mentor, index) => (
               <View key={index} style={styles.mentorCard}>
                 <Image
-                  source={require("/assets/images/home/mentor.png")}
+                  source={require("../../assets/images/home/author.png")}
                   style={styles.mentorImage}
                 />
                 <Text style={styles.mentorName}>{mentor}</Text>
