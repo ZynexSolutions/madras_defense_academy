@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { useColorScheme } from "react-native";
+import { StatusBar } from "react-native";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -12,11 +13,15 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack
-        initialRouteName="(auth)/index"
         screenOptions={{
           headerShown: false,
         }}
-      />
+      >
+        <Stack.Screen name="(auth)/index" />
+
+        <Stack.Screen name="+not-found" />
+      </Stack>
+      <StatusBar barStyle={"default"} />
     </ThemeProvider>
   );
 }

@@ -6,11 +6,20 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import styles from "@/styles/fillProfileStyles";
 import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 const FillProfileScreen = () => {
   const [gender, setGender] = useState();
+
+  const router = useRouter();
+
+  function goToTheLastPage() {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -20,7 +29,7 @@ const FillProfileScreen = () => {
           size={24}
           color="black"
           style={styles.backIcon}
-          onPress={() => console.log("back")}
+          onPress={goToTheLastPage}
         />
         <Text style={styles.title}>Fill Your Profile</Text>
       </View>

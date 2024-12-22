@@ -34,7 +34,7 @@ const AuthScreen = () => {
         <Text style={styles.title}>Let's you in</Text>
         <View style={styles.authButtonsContainer}>
           <OpacityButton
-            onPress={() => console.log("Continue with Google")}
+            onPress={() => router.push("/(auth)/fillProfile")}
             style={styles.authButton}
           >
             <View style={styles.buttonContent}>
