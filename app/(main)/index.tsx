@@ -12,6 +12,7 @@ import { Ionicons, Feather } from "@expo/vector-icons";
 import { useState } from "react";
 
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 
 const categories = ["All", "Category 1", "Category 2", "Category 3"];
 const courses = [
@@ -35,6 +36,8 @@ const topMentors = ["Sonja", "Jensen", "Victoria", "Castaldo", "Smith"];
 
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -219,7 +222,10 @@ export default function HomeScreen() {
           <Ionicons name="list-outline" size={24} color="gray" />
           <Text style={styles.tabText}>Tests</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton}>
+        <TouchableOpacity
+          style={styles.tabButton}
+          onPress={() => router.navigate("/(main)/profile")}
+        >
           <Ionicons name="person-outline" size={24} color="gray" />
           <Text style={styles.tabText}>Profile</Text>
         </TouchableOpacity>
