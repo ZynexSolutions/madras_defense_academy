@@ -48,6 +48,9 @@ const styles = StyleSheet.create({
   menu: {
     flex: 1,
     paddingHorizontal: 18,
+    backgroundColor: "#fff",
+    marginHorizontal: 22,
+    borderRadius: 14,
   },
   menuItem: {
     flexDirection: "row",

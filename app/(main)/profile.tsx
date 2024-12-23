@@ -4,6 +4,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import React from "react";
 import styles from "@/styles/profileStyles";
@@ -49,60 +50,66 @@ const ProfileScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons
-            name="arrow-back"
-            size={24}
-            color="black"
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Profile</Text>
-      </View>
-      <View style={styles.profileContainer}>
-        <View style={styles.imageContainer}>
-          <Placeholder
-            width={width * 0.3}
-            height={width * 0.3}
-            borderRadius={(width * 0.3) / 2}
-          />
-          <TouchableOpacity style={styles.editImageIcon}>
-            <Ionicons name="camera-outline" size={20} color="#000" />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={styles.backIcon}
+            />
           </TouchableOpacity>
+          <Text style={styles.headerText}>Profile</Text>
         </View>
-        <View style={styles.info}>
-          <Text style={styles.name}>James S. Hernandez</Text>
-          <Text style={styles.email}>hernandex.redial@gmail.ac.in</Text>
+        <View style={styles.profileContainer}>
+          <View style={styles.imageContainer}>
+            <Placeholder
+              width={width * 0.3}
+              height={width * 0.3}
+              borderRadius={(width * 0.3) / 2}
+            />
+            <TouchableOpacity style={styles.editImageIcon}>
+              <Ionicons name="camera-outline" size={20} color="#000" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.info}>
+            <Text style={styles.name}>James S. Hernandez</Text>
+            <Text style={styles.email}>hernandex.redial@gmail.ac.in</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.menu}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.menuItem}
-            onPress={() => {
-              if (item.route) navigation.navigate(item.route as never);
-              else console.log(item.title);
-            }}
-          >
-            <View style={styles.menuItemContent}>
-              <Ionicons name={item.icon as any} size={22} color="black" />
-              <Text style={styles.menuItemText}>{item.title}</Text>
-            </View>
-            <View style={styles.menuItemValueContainer}>
-              {item.value && (
-                <Text style={styles.menuItemValue}>{item.value}</Text>
-              )}
-              <Ionicons
-                name="chevron-forward-outline"
-                size={20}
-                color="black"
-              />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
+        <View style={styles.menu}>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.menuItem,
+                index === menuItems.length - 1 && { borderBottomWidth: 0 },
+              ]}
+              onPress={() => {
+                // if (item.route) navigation.navigate(item.route as never);
+                if (item.route) console.log(item.route);
+                else console.log(item.title);
+              }}
+            >
+              <View style={styles.menuItemContent}>
+                <Ionicons name={item.icon as any} size={22} color="black" />
+                <Text style={styles.menuItemText}>{item.title}</Text>
+              </View>
+              <View style={styles.menuItemValueContainer}>
+                {item.value && (
+                  <Text style={styles.menuItemValue}>{item.value}</Text>
+                )}
+                <Ionicons
+                  name="chevron-forward-outline"
+                  size={20}
+                  color="black"
+                />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };

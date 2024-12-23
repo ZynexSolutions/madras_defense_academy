@@ -13,6 +13,7 @@ import { useState } from "react";
 
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import BottomNavigationBar from "@/components/BottomNavigationBar";
 
 const categories = ["All", "Category 1", "Category 2", "Category 3"];
 const courses = [
@@ -205,7 +206,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
       </ScrollView>
-      <View style={styles.bottomTab}>
+      {/* <View style={styles.bottomTab}>
         <TouchableOpacity style={styles.tabButton}>
           <Feather name="home" size={24} color="#146EF2" />
           <Text style={[styles.tabText, { color: "#146EF2" }]}>Home</Text>
@@ -229,7 +230,8 @@ export default function HomeScreen() {
           <Ionicons name="person-outline" size={24} color="gray" />
           <Text style={styles.tabText}>Profile</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
+      <BottomNavigationBar />
     </SafeAreaView>
   );
 }
