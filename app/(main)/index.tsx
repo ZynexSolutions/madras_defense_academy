@@ -205,32 +205,12 @@ export default function HomeScreen() {
             ))}
           </ScrollView>
         </View>
+        <View
+          style={{
+            height: 68,
+          }}
+        ></View>
       </ScrollView>
-      {/* <View style={styles.bottomTab}>
-        <TouchableOpacity style={styles.tabButton}>
-          <Feather name="home" size={24} color="#146EF2" />
-          <Text style={[styles.tabText, { color: "#146EF2" }]}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton}>
-          <Ionicons name="book-outline" size={24} color="gray" />
-          <Text style={styles.tabText}>Course</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton}>
-          <Ionicons name="play-outline" size={24} color="gray" />
-          <Text style={styles.tabText}>Feeds</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabButton}>
-          <Ionicons name="list-outline" size={24} color="gray" />
-          <Text style={styles.tabText}>Tests</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.tabButton}
-          onPress={() => router.navigate("/(main)/profile")}
-        >
-          <Ionicons name="person-outline" size={24} color="gray" />
-          <Text style={styles.tabText}>Profile</Text>
-        </TouchableOpacity>
-      </View> */}
       <BottomNavigationBar />
     </SafeAreaView>
   );

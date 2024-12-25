@@ -5,12 +5,20 @@ import { useRouter, usePathname } from "expo-router";
 
 import { Feather } from "@expo/vector-icons";
 import { CustomIcon } from "./CustomIcons";
+import { IconNameKeyType } from "./utils/IconLists";
 
 const BottomNavigationBar = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const tabs = [
-    { name: "Home", icon: "home", route: "/(main)" }, // Assuming '/' is your Home route
+
+  interface TabType {
+    name: string;
+    icon: IconNameKeyType;
+    route: string;
+  }
+
+  const tabs: TabType[] = [
+    { name: "Home", icon: "home", route: "/(main)/index" }, // Assuming '/' is your Home route
     { name: "Course", icon: "book", route: "/course" },
     { name: "Feeds", icon: "video-square", route: "/feeds" },
     { name: "Tests", icon: "task-square", route: "/tests" },
@@ -37,10 +45,11 @@ const BottomNavigationBar = () => {
             color={pathname === tab.route ? "#146EF2" : "gray"}
           /> */}
           <CustomIcon
-            name={tab.icon as never}
+            name={tab.icon}
             size={24}
             style={{
               overlayColor: pathname === tab.route ? "#146EF2" : "gray",
+              marginBottom: 2,
             }}
             // color={pathname === tab.route ? "#146EF2" : "gray"}
           />
