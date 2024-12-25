@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import Placeholder from "@/components/Placeholder";
 import { Dimensions } from "react-native";
+import BottomNavigationBar from "@/components/BottomNavigationBar";
 
 const { width } = Dimensions.get("window");
 
@@ -109,7 +110,9 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
+        <View style={{ height: 90 }} />
       </ScrollView>
+      <BottomNavigationBar />
     </SafeAreaView>
   );
 };

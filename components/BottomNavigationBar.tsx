@@ -18,7 +18,7 @@ const BottomNavigationBar = () => {
   }
 
   const tabs: TabType[] = [
-    { name: "Home", icon: "home", route: "/(main)/index" }, // Assuming '/' is your Home route
+    { name: "Home", icon: "home", route: "/(main)/" },
     { name: "Course", icon: "book", route: "/course" },
     { name: "Feeds", icon: "video-square", route: "/feeds" },
     { name: "Tests", icon: "task-square", route: "/tests" },
@@ -26,10 +26,12 @@ const BottomNavigationBar = () => {
   ];
 
   useEffect(() => {
-    console.log(pathname);
+    console.log("pathname : " + pathname);
   }, [pathname]);
 
-  const handlePress = (route: any) => router.push(route);
+  const handlePress = (route: any) => {
+    router.replace(route);
+  };
 
   return (
     <View style={styles.bottomTab}>
@@ -39,19 +41,16 @@ const BottomNavigationBar = () => {
           style={styles.tabButton}
           onPress={() => handlePress(tab.route)}
         >
-          {/* <Feather
-            name={tab.icon as never}
-            size={24}
-            color={pathname === tab.route ? "#146EF2" : "gray"}
-          /> */}
           <CustomIcon
             name={tab.icon}
             size={24}
             style={{
-              overlayColor: pathname === tab.route ? "#146EF2" : "gray",
+              tintColor:
+                pathname === tab.route.replace("/(main)", "")
+                  ? "#146EF2"
+                  : "gray",
               marginBottom: 2,
             }}
-            // color={pathname === tab.route ? "#146EF2" : "gray"}
           />
           <Text
             style={[
