@@ -20,7 +20,7 @@ const BottomNavigationBar = () => {
   const tabs: TabType[] = [
     { name: "Home", icon: "home", route: "/(main)/" },
     { name: "Course", icon: "book", route: "/course" },
-    { name: "Feeds", icon: "video-square", route: "/feeds" },
+    { name: "Feeds", icon: "video-square", route: "/(main)/feeds" },
     { name: "Tests", icon: "task-square", route: "/tests" },
     { name: "Profile", icon: "profile-circle", route: "/(main)/profile" },
   ];
