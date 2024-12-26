@@ -15,9 +15,18 @@ import Placeholder from "@/components/Placeholder";
 import { styles } from "@/styles/feedStyles";
 import { FeedCard } from "@/components/FeedCard";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
+import { CustomIcon } from "@/components/CustomIcons";
 
 export default function FeedsScreen() {
   const cardData = [
+    {
+      accountName: "Account Name",
+      time: "1 hour ago",
+      content: "Lorem Ipsum Dorea Islop",
+      likes: "95",
+      comments: "25",
+      image: require("../../assets/images/home/course.png"),
+    },
     {
       accountName: "Account Name",
       time: "1 hour ago",
@@ -38,23 +47,25 @@ export default function FeedsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <Text style={styles.title}>MadrasDefenceAcademy</Text>
+        <Text style={styles.title}>Madras Defence Academy</Text>
         <View style={styles.headerActions}>
           <OpacityButton>
-            <Ionicons name="search" size={24} color="black" />
+            <CustomIcon name="search" size={24} color="black" />
           </OpacityButton>
           <OpacityButton>
-            <Ionicons name="add-circle-outline" size={24} color="black" />
+            <CustomIcon name="plus-rounded-square" size={24} color="black" />
           </OpacityButton>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           {cardData.map((card, index) => (
             <FeedCard key={index} {...card} />
           ))}
         </View>
+        <View style={{ height: 54 }} />
       </ScrollView>
+      <BottomNavigationBar />
     </SafeAreaView>
   );
 }

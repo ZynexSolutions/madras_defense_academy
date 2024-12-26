@@ -5,24 +5,31 @@ const { width } = Dimensions.get("window");
 const cardWidth = width * 0.9;
 
 export const styles = StyleSheet.create({
+  FeedPageContainer: {
+    flex: 1,
+    height: "100%",
+  },
   safeArea: {
     flex: 1,
     backgroundColor: "#F5F9FF",
   },
   headerContainer: {
+    display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingVertical: 22,
+    // backgroundColor: "red",
   },
   title: {
+    color: "#0961F5",
     fontSize: 20,
     fontWeight: "bold",
   },
   headerActions: {
     flexDirection: "row",
-    gap: 10,
+    gap: 20,
   },
   container: {
     flex: 1,

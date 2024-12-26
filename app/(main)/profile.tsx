@@ -20,7 +20,11 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
 
   const menuItems = [
-    { title: "Edit Profile", icon: "person-outline", route: "EditProfile" },
+    {
+      title: "Edit Profile",
+      icon: "person-outline",
+      route: "(profile)/editProfile",
+    },
     { title: "Payment Option", icon: "card-outline", route: "PaymentOption" },
     {
       title: "Notifications",
@@ -88,9 +92,7 @@ const ProfileScreen = () => {
                 index === menuItems.length - 1 && { borderBottomWidth: 0 },
               ]}
               onPress={() => {
-                // if (item.route) navigation.navigate(item.route as never);
-                if (item.route) console.log(item.route);
-                else console.log(item.title);
+                if (item.route) navigation.navigate(item.route as never);
               }}
             >
               <View style={styles.menuItemContent}>
