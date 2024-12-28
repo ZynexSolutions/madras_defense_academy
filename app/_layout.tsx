@@ -41,6 +41,13 @@ export default function RootLayout() {
     }
   }, [userData, loading, router]);
 
+  // supabase.auth.onAuthStateChange((event, session) => {
+  //   (async () => {
+  //     const user = await supabase.auth.getUser();
+  //     setUserData(user.data.user);
+  //   })();
+  // });
+
   if (loading) {
     return (
       <View
