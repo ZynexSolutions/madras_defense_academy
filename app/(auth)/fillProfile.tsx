@@ -1,19 +1,61 @@
 import Placeholder from "@/components/Placeholder";
-import { View, Text, Dimensions, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { OpacityButton } from "@/components/OpacityButton";
 import { SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import styles from "@/styles/fillProfileStyles";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
+import { UserContext } from "../_layout";
+import { supabase } from "@/components/backend/supabase";
+import ModalComponent from "@/components/Modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const { width } = Dimensions.get("window");
 
 const FillProfileScreen = () => {
-  const [gender, setGender] = useState();
+  const [gender, setGender] = useState<string | undefined>(undefined);
+  const [full_name, setFull_name] = useState<string | undefined>(undefined);
+  const [nick_name, setNick_name] = useState<string | undefined>(undefined);
+  const [date_of_birth, setDate_of_birth] = useState<Date | undefined>(
+    undefined
+  );
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [email, setEmail] = useState<string | undefined>(undefined);
+  const [phone_number, setPhone_number] = useState<string | undefined>(
+    undefined
+  );
+
+  interface IErrorSignIn {
+    title?: string;
+    message: string;
+    error: boolean;
+  }
+  const [error, setError] = useState<IErrorSignIn>({
+    error: false,
+    message: "",
+  });
 
   const router = useRouter();
+  const userData = useContext(UserContext);
+
+  const onChange = (event: any, selectedDate: Date | undefined) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setDate_of_birth(selectedDate);
+    }
+  };
+
+  const showDatepicker = () => {
+    setShowDatePicker(true);
+  };
 
   function goToTheLastPage() {
     if (router.canGoBack()) {
@@ -21,8 +63,69 @@ const FillProfileScreen = () => {
     }
   }
 
+  async function updateUserDetails() {
+    if (
+      !full_name ||
+      !nick_name ||
+      !date_of_birth ||
+      (!userData?.userData?.user_metadata?.email && !email) ||
+      (!userData?.userData?.user_metadata?.phone_number && !phone_number) ||
+      !gender
+    ) {
+      setError({
+        error: true,
+        message: "Please fill in all the fields",
+      });
+      return;
+    }
+
+    interface Updates {
+      full_name: string | undefined;
+      nick_name: string | undefined;
+      date_of_birth: string | undefined;
+      gender: string | undefined;
+      email?: string | undefined;
+      phone_number?: string | undefined;
+    }
+
+    const updates: Updates = {
+      full_name: full_name,
+      nick_name: nick_name,
+      date_of_birth: date_of_birth?.toISOString(),
+      gender: gender,
+    };
+
+    if (!userData?.userData?.user_metadata?.email && email) {
+      updates.email = email;
+    }
+    if (!userData?.userData?.user_metadata?.phone_number && phone_number) {
+      updates.phone_number = phone_number;
+    }
+
+    const { data, error: err } = await supabase.auth.updateUser({
+      data: updates,
+    });
+
+    if (err) {
+      setError({
+        error: true,
+        message: err.message,
+      });
+      return;
+    }
+
+    router.replace("/(main)");
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ModalComponent
+        title={error.title}
+        message={error.message}
+        visible={error.error}
+        type="error"
+        onClose={() => setError({ error: false, message: "" })}
+      />
       <View style={styles.header}>
         <Ionicons
           name="arrow-back"
@@ -53,10 +156,20 @@ const FillProfileScreen = () => {
       <View style={styles.bottomSection}>
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
-            <TextInput placeholder="Full Name" style={styles.input} />
+            <TextInput
+              placeholder="Full Name"
+              style={styles.input}
+              onChangeText={(text) => setFull_name(text)}
+              value={full_name}
+            />
           </View>
           <View style={styles.inputContainer}>
-            <TextInput placeholder="Nick Name" style={styles.input} />
+            <TextInput
+              placeholder="Nick Name"
+              style={styles.input}
+              onChangeText={(text) => setNick_name(text)}
+              value={nick_name}
+            />
           </View>
           <View style={styles.inputContainer}>
             <Ionicons
@@ -65,30 +178,59 @@ const FillProfileScreen = () => {
               color="gray"
               style={styles.icon}
             />
-            <TextInput placeholder="Date of Birth" style={styles.input} />
+            <TouchableOpacity
+              onPress={showDatepicker}
+              style={{ flex: 1, height: 52, justifyContent: "center" }}
+            >
+              <Text style={{ color: date_of_birth ? "black" : "gray" }}>
+                {date_of_birth
+                  ? date_of_birth.toLocaleDateString()
+                  : "Date of Birth"}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date_of_birth || new Date()}
+                mode="date"
+                display="default"
+                onChange={onChange}
+              />
+            )}
           </View>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="mail-outline"
-              size={24}
-              color="gray"
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Email"
-              style={styles.input}
-              keyboardType="email-address"
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="call-outline"
-              size={24}
-              color="gray"
-              style={styles.icon}
-            />
-            <TextInput placeholder="(+91) 987 654 3210" style={styles.input} />
-          </View>
+          {!userData?.userData?.user_metadata?.email && (
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="mail-outline"
+                size={24}
+                color="gray"
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="Email"
+                style={styles.input}
+                keyboardType="email-address"
+                onChangeText={(text) => setEmail(text)}
+                value={email}
+              />
+            </View>
+          )}
+          {!userData?.userData?.user_metadata?.phone_number && (
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="call-outline"
+                size={24}
+                color="gray"
+                style={styles.icon}
+              />
+              <TextInput
+                placeholder="(+91) 987 654 3210"
+                style={styles.input}
+                onChangeText={(text) => setPhone_number(text)}
+                value={phone_number}
+              />
+            </View>
+          )}
           <View style={styles.inputContainer}>
             <Picker
               selectedValue={gender}
@@ -99,7 +241,7 @@ const FillProfileScreen = () => {
             >
               <Picker.Item
                 label="Gender"
-                value=""
+                value={undefined}
                 color="gray"
                 style={{ fontSize: 16 }}
               />
@@ -118,9 +260,7 @@ const FillProfileScreen = () => {
           </View>
         </View>
         <OpacityButton
-          onPress={() => {
-            console.log("continue");
-          }}
+          onPress={updateUserDetails}
           style={styles.continueButton}
         >
           <View style={styles.buttonContent}>

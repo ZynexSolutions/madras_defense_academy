@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import Placeholder from "@/components/Placeholder";
 import { Dimensions } from "react-native";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
+import { supabase } from "@/components/backend/supabase";
 
 const { width } = Dimensions.get("window");
 
@@ -51,6 +52,16 @@ const ProfileScreen = () => {
     },
     { title: "Help Center", icon: "help-circle-outline", route: "HelpCenter" },
     { title: "Intive Friends", icon: "mail-outline", route: "InviteFriends" },
+  ];
+
+  const destructiveMenuItems = [
+    {
+      title: "Logout",
+      icon: "log-out-outline",
+      action: () => {
+        supabase.auth.signOut();
+      },
+    },
   ];
 
   return (
@@ -108,6 +119,27 @@ const ProfileScreen = () => {
                   size={20}
                   color="black"
                 />
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.menu}>
+          {destructiveMenuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.menuItem,
+                index === destructiveMenuItems.length - 1 && {
+                  borderBottomWidth: 0,
+                },
+              ]}
+              onPress={item.action}
+            >
+              <View style={styles.menuItemContent}>
+                <Ionicons name={item.icon as any} size={22} color="crimson" />
+                <Text style={[styles.menuItemText, { color: "crimson" }]}>
+                  {item.title}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}

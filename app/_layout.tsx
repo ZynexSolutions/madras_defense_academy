@@ -34,7 +34,11 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loading) {
       if (userData) {
-        router.replace("/(main)");
+        if (userData.user_metadata?.full_name) {
+          router.replace("/(main)");
+        } else {
+          router.replace("/(auth)/fillProfile");
+        }
       } else {
         router.replace("/(auth)");
       }
