@@ -60,22 +60,22 @@ export const FeedCard = ({
       <View style={styles.footer}>
         <View style={styles.interaction}>
           <OpacityButton>
-            <Ionicons name="heart-outline" size={24} />
+            <Ionicons name="heart-outline" size={20} />
           </OpacityButton>
           <Text style={styles.likes}>{likes}</Text>
         </View>
         <View style={styles.interaction}>
           <OpacityButton>
-            <Ionicons name="chatbubble-outline" size={24} />
+            <Ionicons name="chatbubble-outline" size={20} />
           </OpacityButton>
           <Text style={styles.comments}>{comments}</Text>
         </View>
         <View style={styles.secondaryActions}>
           <OpacityButton>
-            <Ionicons name="bookmark-outline" size={24} />
+            <Ionicons name="bookmark-outline" size={20} />
           </OpacityButton>
           <OpacityButton>
-            <Ionicons name="share-social-outline" size={24} />
+            <Ionicons name="share-social-outline" size={20} />
           </OpacityButton>
         </View>
       </View>

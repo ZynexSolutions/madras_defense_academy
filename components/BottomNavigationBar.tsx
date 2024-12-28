@@ -78,7 +78,13 @@ const BottomNavigationBar = () => {
           <Text
             style={[
               styles.tabText,
-              { color: pathname === tab.route ? "#146EF2" : "gray" },
+              {
+                color:
+                  pathname === tab.route.replace("/(main)", "")
+                    ? "#146EF2"
+                    : "gray",
+                marginBottom: 2,
+              },
             ]}
           >
             {tab.name}
