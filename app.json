@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.mda"
     },
     "web": {
       "bundler": "metro",
@@ -36,9 +37,10 @@
       [
         "expo-asset",
         {
-          "assets": ["/assets/icons/"]
+          "assets": ["./assets/icons/"]
         }
-      ]
+      ],
+      "@react-native-google-signin/google-signin"
     ],
     "experiments": {
       "typedRoutes": true

@@ -3,16 +3,33 @@ import { View, Text, Dimensions, TextInput } from "react-native";
 import { OpacityButton } from "@/components/OpacityButton";
 import { SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "@/styles/signinStyles";
 import Checkbox from "expo-checkbox"; // Import Checkbox
 import { useRouter } from "expo-router";
+import { UserContext } from "../_layout";
+import { supabase } from "@/components/backend/supabase";
+import ModalComponent from "@/components/Modal";
 
 const { width } = Dimensions.get("window");
 
 const SignInScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChecked, setChecked] = useState(false); // State for checkbox
+  const [email, setEmail] = useState(""); // State for email
+  const [password, setPassword] = useState(""); // State for password
+
+  interface IErrorSignIn {
+    title?: string;
+    message: string;
+    error: boolean;
+  }
+  const [error, setError] = useState<IErrorSignIn>({
+    error: false,
+    message: "",
+  });
+
+  const userData = useContext(UserContext);
 
   const router = useRouter();
 
@@ -20,8 +37,50 @@ const SignInScreen = () => {
     router.replace("/(auth)/signup");
   }
 
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN") {
+      router.replace("/(main)");
+    }
+  });
+
+  useEffect(() => {
+    userData?.userData && router.replace("/(main)");
+  }, []);
+
+  function SignInUserAccount() {
+    if (email === "" || password === "") {
+      setError({
+        error: true,
+        message: "Please fill in all the fields",
+      });
+      return;
+    }
+
+    // Sign in user account
+    supabase.auth
+      .signInWithPassword({
+        email: email,
+        password: password,
+      })
+      .then((value) => {
+        if (value.error) {
+          setError({
+            error: true,
+            message: value.error.message,
+          });
+        }
+      });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ModalComponent
+        title={error.title}
+        message={error.message}
+        visible={error.error}
+        type="error"
+        onClose={() => setError({ error: false, message: "" })}
+      />
       <View style={styles.topSection}>
         <View style={styles.logoContainer}>
           <Placeholder
@@ -48,6 +107,8 @@ const SignInScreen = () => {
               placeholder="Email"
               style={styles.input}
               keyboardType="email-address"
+              onChangeText={(text) => setEmail(text)}
+              value={email}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -61,6 +122,8 @@ const SignInScreen = () => {
               placeholder="Password"
               style={styles.input}
               secureTextEntry={!passwordVisible}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
             />
             <Ionicons
               name={passwordVisible ? "eye-off-outline" : "eye-outline"}
@@ -82,12 +145,7 @@ const SignInScreen = () => {
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </View>
         </View>
-        <OpacityButton
-          onPress={() => {
-            console.log("Sign In");
-          }}
-          style={styles.signInButton}
-        >
+        <OpacityButton onPress={SignInUserAccount} style={styles.signInButton}>
           <View style={styles.buttonContent}>
             <Text style={styles.signInButtonText}>Sign In</Text>
             <View style={styles.SignInButtonNextIconContainer}>

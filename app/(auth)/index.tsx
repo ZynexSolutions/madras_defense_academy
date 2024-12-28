@@ -34,7 +34,7 @@ const AuthScreen = () => {
         <Text style={styles.title}>Let's you in</Text>
         <View style={styles.authButtonsContainer}>
           <OpacityButton
-            onPress={() => router.push("/(auth)/fillProfile")}
+            onPress={() => console.log("sign in with google")}
             style={styles.authButton}
           >
             <View style={styles.buttonContent}>
@@ -43,7 +43,7 @@ const AuthScreen = () => {
             </View>
           </OpacityButton>
           <OpacityButton
-            onPress={() => router.push("/(main)")}
+            onPress={() => console.log("sign in with apple")}
             style={styles.authButton}
           >
             <View style={styles.buttonContent}>

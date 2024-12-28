@@ -1,18 +1,35 @@
 import Placeholder from "@/components/Placeholder";
-import { View, Text, Dimensions, TextInput } from "react-native";
+import { View, Text, Dimensions, TextInput, ToastAndroid } from "react-native";
 import { OpacityButton } from "@/components/OpacityButton";
 import { SafeAreaView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "@/styles/signupStyles";
 import Checkbox from "expo-checkbox"; // Import Checkbox
 import { useRouter } from "expo-router"; // Import useRouter from expo-router
+import { UserContext } from "../_layout";
+import ModalComponent from "@/components/Modal";
+import { supabase } from "@/components/backend/supabase";
 
 const { width } = Dimensions.get("window");
 
 const SignUpScreen = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isChecked, setChecked] = useState(false); // State for checkbox
+  const [email, setEmail] = useState(""); // State for email
+  const [password, setPassword] = useState(""); // State for password
+
+  interface IErrorSignUp {
+    title?: string;
+    message: string;
+    error: boolean;
+  }
+  const [error, setError] = useState<IErrorSignUp>({
+    error: false,
+    message: "",
+  });
+
+  const userData = useContext(UserContext);
 
   const router = useRouter();
 
@@ -20,8 +37,58 @@ const SignUpScreen = () => {
     router.replace("/(auth)/signin");
   }
 
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN") {
+      router.replace("/(main)");
+    }
+  });
+
+  useEffect(() => {
+    userData?.userData && router.replace("/(main)");
+  }, []);
+
+  function CreateUserAccount() {
+    if (!isChecked) {
+      setError({
+        error: true,
+        message: "Please agree to the terms and conditions",
+      });
+      return;
+    }
+
+    if (email === "" || password === "") {
+      setError({
+        error: true,
+        message: "Please fill in all the fields",
+      });
+      return;
+    }
+
+    // Create user account
+    supabase.auth
+      .signUp({
+        email: email,
+        password: password,
+      })
+      .then((value) => {
+        if (value.error) {
+          setError({
+            error: true,
+            message: value.error.message,
+          });
+        }
+      });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <ModalComponent
+        title={error.title}
+        message={error.message}
+        visible={error.error}
+        type="error"
+        onClose={() => setError({ error: false, message: "" })}
+      />
       <View style={styles.topSection}>
         <View style={styles.logoContainer}>
           <Placeholder
@@ -32,9 +99,9 @@ const SignUpScreen = () => {
         </View>
       </View>
       <View style={styles.bottomSection}>
-        <Text style={styles.title}>Getting Started..!</Text>
+        <Text style={styles.title}>Get Started!</Text>
         <Text style={styles.subTitle}>
-          Create an Account to Continue your all Courses
+          Join our community and start learning today!
         </Text>
         <View style={styles.formContainer}>
           <View style={styles.inputContainer}>
@@ -48,6 +115,8 @@ const SignUpScreen = () => {
               placeholder="Email"
               style={styles.input}
               keyboardType="email-address"
+              onChangeText={(text) => setEmail(text)}
+              value={email}
             />
           </View>
           <View style={styles.inputContainer}>
@@ -61,6 +130,8 @@ const SignUpScreen = () => {
               placeholder="Password"
               style={styles.input}
               secureTextEntry={!passwordVisible}
+              onChangeText={(text) => setPassword(text)}
+              value={password}
             />
             <Ionicons
               name={passwordVisible ? "eye-off-outline" : "eye-outline"}
@@ -79,16 +150,7 @@ const SignUpScreen = () => {
             <Text style={styles.termsText}>Agree to Terms & Conditions</Text>
           </View>
         </View>
-        <OpacityButton
-          onPress={() => {
-            if (isChecked) {
-              console.log("Sign Up"); // Proceed only if checked
-            } else {
-              alert("Please agree to the Terms & Conditions");
-            }
-          }}
-          style={styles.signInButton}
-        >
+        <OpacityButton onPress={CreateUserAccount} style={styles.signInButton}>
           <View style={styles.buttonContent}>
             <Text style={styles.signInButtonText}>Sign Up</Text>
             <View style={styles.SignInButtonNextIconContainer}>
