@@ -41,12 +41,19 @@ export default function RootLayout() {
     }
   }, [userData, loading, router]);
 
-  // supabase.auth.onAuthStateChange((event, session) => {
-  //   (async () => {
-  //     const user = await supabase.auth.getUser();
-  //     setUserData(user.data.user);
-  //   })();
-  // });
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && !userData) {
+      (async () => {
+        const user = await supabase.auth.getUser();
+        setUserData(user.data.user);
+      })();
+    } else if (event === "SIGNED_OUT" && userData) {
+      (async () => {
+        const user = await supabase.auth.getUser();
+        setUserData(user.data.user);
+      })();
+    }
+  });
 
   if (loading) {
     return (
