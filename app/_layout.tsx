@@ -6,12 +6,13 @@ import {
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "react-native";
 import { StatusBar, View, ActivityIndicator } from "react-native";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/components/backend/supabase";
 import { User } from "@supabase/supabase-js";
 
 type UserContextType = {
   userData: User | null;
+  refreshUserData: () => Promise<void>;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -22,14 +23,17 @@ export default function RootLayout() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const refreshUserData = useCallback(async () => {
+    const user = await supabase.auth.getUser();
+    setUserData(user.data.user);
+  }, []);
+
   useEffect(() => {
     (async () => {
-      const user = await supabase.auth.getUser();
-      console.log(user.data.user);
-      setUserData(user.data.user);
+      await refreshUserData();
       setLoading(false);
     })();
-  }, []);
+  }, [refreshUserData]);
 
   useEffect(() => {
     if (!loading) {
@@ -46,16 +50,10 @@ export default function RootLayout() {
   }, [userData, loading, router]);
 
   supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_IN" && !userData) {
-      (async () => {
-        const user = await supabase.auth.getUser();
-        setUserData(user.data.user);
-      })();
-    } else if (event === "SIGNED_OUT" && userData) {
-      (async () => {
-        const user = await supabase.auth.getUser();
-        setUserData(user.data.user);
-      })();
+    if (event === "SIGNED_IN") {
+      refreshUserData();
+    } else if (event === "SIGNED_OUT") {
+      refreshUserData();
     }
   });
 
@@ -75,7 +73,7 @@ export default function RootLayout() {
   }
 
   return (
-    <UserContext.Provider value={{ userData }}>
+    <UserContext.Provider value={{ userData, refreshUserData }}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack
           screenOptions={{

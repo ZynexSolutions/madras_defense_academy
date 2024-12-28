@@ -6,7 +6,7 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React from "react";
+import React, { useContext } from "react";
 import styles from "@/styles/profileStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -14,11 +14,14 @@ import Placeholder from "@/components/Placeholder";
 import { Dimensions } from "react-native";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { supabase } from "@/components/backend/supabase";
+import { UserContext } from "../_layout";
 
 const { width } = Dimensions.get("window");
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+
+  const userData = useContext(UserContext);
 
   const menuItems = [
     {
@@ -90,8 +93,12 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.info}>
-            <Text style={styles.name}>James S. Hernandez</Text>
-            <Text style={styles.email}>hernandex.redial@gmail.ac.in</Text>
+            <Text style={styles.name}>
+              {userData?.userData?.user_metadata?.full_name}
+            </Text>
+            <Text style={styles.email}>
+              {userData?.userData?.user_metadata?.email}
+            </Text>
           </View>
         </View>
         <View style={styles.menu}>

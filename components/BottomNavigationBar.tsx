@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { View, TouchableOpacity, Text, BackHandler } from "react-native";
 import styles from "@/styles/BottomNavigationBarStyles"; // Import your stylesheet
 import { useRouter, usePathname } from "expo-router";
 
@@ -26,10 +26,33 @@ const BottomNavigationBar = () => {
   ];
 
   useEffect(() => {
-    console.log("pathname : " + pathname);
-  }, [pathname]);
+    const backAction = () => {
+      if (pathname === "/") {
+        BackHandler.exitApp();
+      } else {
+        router.replace("/(main)");
+      }
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [pathname, router]);
 
   const handlePress = (route: any) => {
+    const currentRoute = route.replace("/(main)", "");
+
+    if (pathname === currentRoute) {
+      if (route === "/(main)/") {
+        BackHandler.exitApp();
+      }
+      return;
+    }
+
     router.replace(route);
   };
 
