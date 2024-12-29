@@ -93,17 +93,19 @@ export const FeedCard = ({
       )}
       <Image source={image} style={styles.postImage} />
       <View style={styles.footer}>
-        <View style={styles.interaction}>
-          <OpacityButton>
-            <Ionicons name="heart-outline" size={20} />
-          </OpacityButton>
-          <Text style={styles.likes}>{likes}</Text>
-        </View>
-        <View style={styles.interaction}>
-          <OpacityButton>
-            <Ionicons name="chatbubble-outline" size={20} />
-          </OpacityButton>
-          <Text style={styles.comments}>{comments}</Text>
+        <View style={styles.footerPrimaryActions}>
+          <View style={styles.interaction}>
+            <OpacityButton>
+              <Ionicons name="heart-outline" size={20} />
+            </OpacityButton>
+            <Text style={styles.likes}>{likes}</Text>
+          </View>
+          <View style={styles.interaction}>
+            <OpacityButton>
+              <Ionicons name="chatbubble-outline" size={20} />
+            </OpacityButton>
+            <Text style={styles.comments}>{comments}</Text>
+          </View>
         </View>
         <View style={styles.secondaryActions}>
           <OpacityButton>

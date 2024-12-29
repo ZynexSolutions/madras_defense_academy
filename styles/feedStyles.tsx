@@ -99,6 +99,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10, // Added padding to align with the image
     paddingBottom: 10, // Added padding at the bottom
   },
+  footerPrimaryActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    display: "flex",
+    gap: 14,
+  },
   interaction: {
     flexDirection: "row",
     alignItems: "center",

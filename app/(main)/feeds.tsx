@@ -1,23 +1,17 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Dimensions,
-  ScrollView,
-  ImageSourcePropType,
-} from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { OpacityButton } from "@/components/OpacityButton";
-import Placeholder from "@/components/Placeholder";
 import { styles } from "@/styles/feedStyles";
 import { FeedCard } from "@/components/FeedCard";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { CustomIcon } from "@/components/CustomIcons";
+import { useRouter } from "expo-router";
+import { supabase } from "@/components/backend/supabase";
 
 export default function FeedsScreen() {
+  const router = useRouter();
+
   const cardData = [
     {
       accountName: "Account Name",
@@ -45,6 +39,21 @@ export default function FeedsScreen() {
       image: require("../../assets/images/home/course.png"),
     },
   ];
+
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase.from("posts").select(`
+          auth.users (
+            raw_user_meta_data
+          )
+        `);
+      if (error) {
+        console.log(error);
+      }
+      console.log("here is the data: ", data);
+    })();
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -53,7 +62,11 @@ export default function FeedsScreen() {
           <OpacityButton>
             <CustomIcon name="search" size={24} color="black" />
           </OpacityButton>
-          <OpacityButton>
+          <OpacityButton
+            onPress={() => {
+              router.push("/(main)/makePost");
+            }}
+          >
             <CustomIcon name="plus-rounded-square" size={24} color="black" />
           </OpacityButton>
         </View>
