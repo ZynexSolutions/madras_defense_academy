@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import styles from "@/styles/homeStyles";
 import { Ionicons, Feather } from "@expo/vector-icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
+import { UserContext } from "../_layout";
 
 const categories = ["All", "Category 1", "Category 2", "Category 3"];
 const courses = [
@@ -37,6 +38,7 @@ const topMentors = ["Sonja", "Jensen", "Victoria", "Castaldo", "Smith"];
 
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const userData = useContext(UserContext);
 
   const router = useRouter();
 
@@ -45,7 +47,9 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <View style={styles.headerText}>
-            <Text style={styles.title}>Hi, Your Name</Text>
+            <Text style={styles.title}>
+              Hi, {userData?.userData?.user_metadata?.full_name}
+            </Text>
             <Text style={styles.subTitle}>
               What Would you like to learn Today?
             </Text>

@@ -22,7 +22,8 @@ export default function FeedsScreen() {
     {
       accountName: "Account Name",
       time: "1 hour ago",
-      content: "Lorem Ipsum Dorea Islop",
+      content:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo vel mauris ac convallis. Pellentesque venenatis malesuada eros id accumsan. Sed vel mattis lorem, non facilisis sapien. Integer fringilla condimentum elit in luctus. Nunc auctor massa non tellus vestibulum tincidunt. Suspendisse ultrices quam egestas, lobortis ligula non, euismod magna. Nunc a risus ante. Aenean tincidunt, tortor et pellentesque accumsan, nibh",
       likes: "95",
       comments: "25",
       image: require("../../assets/images/home/course.png"),

@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
-    backgroundColor: "#F5F9FF",
+    backgroundColor: "white",
   },
   headerContainer: {
     display: "flex",
@@ -35,23 +35,21 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     paddingBottom: 20,
-    paddingTop: 10,
+    paddingTop: 0, // Removed padding at the top of the container
+    gap: 10,
   },
   card: {
-    // width: cardWidth,
     width: "100%",
     backgroundColor: "white",
-    // borderRadius: 10,
-    // marginBottom: 16,
-    // padding: 16,
+    marginTop: 0, // Removed margin at the top of the card
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
+    // marginBottom: 12,
     padding: 10,
-    marginTop: 12,
+    marginTop: 0, // Removed margin at the top of the header
   },
   accountInfo: {
     flexDirection: "row",
@@ -83,21 +81,23 @@ export const styles = StyleSheet.create({
   },
   content: {
     fontSize: 14,
-    marginBottom: 12,
+    // marginBottom: 12,
     textAlign: "left",
+    paddingHorizontal: 10, // Added padding to align with the image
   },
   postImage: {
-    width: width,
-    height: width,
-    // borderRadius: 10,
-    marginBottom: 12,
-    aspectRatio: 1,
-    resizeMode: "cover",
+    width: width, // Full width
+    height: width, // Height equals width for 1:1 aspect ratio
+    marginVertical: 12, // Added more space between the image and the buttons
+    aspectRatio: 1, // Ensures the image maintains a 1:1 aspect ratio
+    resizeMode: "cover", // Ensures the image covers the area without distortion
   },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: 10, // Added padding to align with the image
+    paddingBottom: 10, // Added padding at the bottom
   },
   interaction: {
     flexDirection: "row",
