@@ -38,7 +38,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (!loading) {
       if (userData) {
-        if (userData.user_metadata?.full_name) {
+        if (userData.user_metadata?.phone_number) {
           router.replace("/(main)");
         } else {
           router.replace("/(auth)/fillProfile");

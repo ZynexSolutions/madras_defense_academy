@@ -6,22 +6,38 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import styles from "@/styles/profileStyles";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
 import Placeholder from "@/components/Placeholder";
 import { Dimensions } from "react-native";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { supabase } from "@/components/backend/supabase";
 import { UserContext } from "../_layout";
+import { useRouter } from "expo-router";
+import { getUserProfile } from "@/components/backend/getProfile";
 
 const { width } = Dimensions.get("window");
 
 const ProfileScreen = () => {
-  const navigation = useNavigation();
-
+  const router = useRouter();
   const userData = useContext(UserContext);
+  const [profile, setProfile] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const profileData = await getUserProfile(userData?.userData?.id);
+        setProfile(profileData);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    if (userData?.userData?.id) {
+      fetchProfile();
+    }
+  }, [userData?.userData?.id]);
 
   const menuItems = [
     {
@@ -71,7 +87,15 @@ const ProfileScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace("/(main)");
+              }
+            }}
+          >
             <Ionicons
               name="arrow-back"
               size={24}
@@ -93,12 +117,8 @@ const ProfileScreen = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.info}>
-            <Text style={styles.name}>
-              {userData?.userData?.user_metadata?.full_name}
-            </Text>
-            <Text style={styles.email}>
-              {userData?.userData?.user_metadata?.email}
-            </Text>
+            <Text style={styles.name}>{profile?.full_name}</Text>
+            <Text style={styles.email}>{userData?.userData?.email}</Text>
           </View>
         </View>
         <View style={styles.menu}>
@@ -110,7 +130,7 @@ const ProfileScreen = () => {
                 index === menuItems.length - 1 && { borderBottomWidth: 0 },
               ]}
               onPress={() => {
-                if (item.route) navigation.navigate(item.route as never);
+                if (item.route) router.navigate(item.route as never);
               }}
             >
               <View style={styles.menuItemContent}>

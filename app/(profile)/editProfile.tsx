@@ -5,6 +5,9 @@ import {
   Dimensions,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import { OpacityButton } from "@/components/OpacityButton";
 import { SafeAreaView } from "react-native";
@@ -17,6 +20,7 @@ import { UserContext } from "../_layout";
 import { supabase } from "@/components/backend/supabase";
 import ModalComponent from "@/components/Modal";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { getUserProfile } from "@/components/backend/getProfile";
 
 const { width } = Dimensions.get("window");
 
@@ -29,10 +33,8 @@ const EditProfileScreen = () => {
   const [initialFullName, setInitialFullName] = useState<string | undefined>(
     undefined
   );
-  const [nick_name, setNick_name] = useState<string | undefined>(undefined);
-  const [initialNickName, setInitialNickName] = useState<string | undefined>(
-    undefined
-  );
+  const [bio, setBio] = useState<string | undefined>(undefined);
+  const [initialBio, setInitialBio] = useState<string | undefined>(undefined);
   const [date_of_birth, setDate_of_birth] = useState<Date | undefined>(
     undefined
   );
@@ -40,13 +42,13 @@ const EditProfileScreen = () => {
     Date | undefined
   >(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
+
   const [email, setEmail] = useState<string | undefined>(undefined);
   const [initialEmail, setInitialEmail] = useState<string | undefined>(
     undefined
   );
-  const [phone_number, setPhone_number] = useState<string | undefined>(
-    undefined
-  );
+
+  const [phoneNumber, setPhoneNumber] = useState<string | undefined>(undefined);
   const [initialPhoneNumber, setInitialPhoneNumber] = useState<
     string | undefined
   >(undefined);
@@ -81,30 +83,45 @@ const EditProfileScreen = () => {
   };
 
   useEffect(() => {
-    if (userData?.userData?.user_metadata) {
-      setInitialFullName(userData.userData.user_metadata.full_name);
-      setInitialNickName(userData.userData.user_metadata.nick_name);
-      setInitialDateOfBirth(
-        userData.userData.user_metadata.date_of_birth
-          ? new Date(userData.userData.user_metadata.date_of_birth)
-          : undefined
-      );
-      setInitialGender(userData.userData.user_metadata.gender);
-      setInitialEmail(userData.userData.user_metadata.email);
-      setInitialPhoneNumber(userData.userData.user_metadata.phone_number);
+    const fetchProfile = async () => {
+      try {
+        const profileData = await getUserProfile(userData?.userData?.id);
+        if (profileData) {
+          setInitialFullName(profileData.full_name);
+          setInitialBio(profileData.bio);
+          setInitialDateOfBirth(
+            profileData.date_of_birth
+              ? new Date(profileData.date_of_birth)
+              : undefined
+          );
+          setInitialGender(profileData.gender);
 
-      setFull_name(userData.userData.user_metadata.full_name);
-      setNick_name(userData.userData.user_metadata.nick_name);
-      setDate_of_birth(
-        userData.userData.user_metadata.date_of_birth
-          ? new Date(userData.userData.user_metadata.date_of_birth)
-          : undefined
-      );
-      setGender(userData.userData.user_metadata.gender);
-      setEmail(userData.userData.user_metadata.email);
-      setPhone_number(userData.userData.user_metadata.phone_number);
+          setFull_name(profileData.full_name);
+          setBio(profileData.bio);
+          setDate_of_birth(
+            profileData.date_of_birth
+              ? new Date(profileData.date_of_birth)
+              : undefined
+          );
+          setGender(profileData.gender);
+
+          setInitialEmail(userData?.userData?.email);
+          setEmail(userData?.userData?.email);
+
+          setInitialPhoneNumber(
+            userData?.userData?.user_metadata?.phone_number
+          );
+          setPhoneNumber(userData?.userData?.user_metadata?.phone_number);
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    if (userData?.userData?.id) {
+      fetchProfile();
     }
-  }, [userData]);
+  }, [userData?.userData?.id]);
 
   const showDatepicker = () => {
     setShowDatePicker(true);
@@ -117,14 +134,15 @@ const EditProfileScreen = () => {
   }
 
   async function updateUserDetails() {
+    // Check if any data has been modified
     if (
       full_name === initialFullName &&
-      nick_name === initialNickName &&
+      bio === initialBio &&
       (date_of_birth?.toISOString() === initialDateOfBirth?.toISOString() ||
         (!date_of_birth && !initialDateOfBirth)) &&
+      gender === initialGender &&
       email === initialEmail &&
-      phone_number === initialPhoneNumber &&
-      gender === initialGender
+      phoneNumber === initialPhoneNumber
     ) {
       setError({
         error: true,
@@ -132,13 +150,15 @@ const EditProfileScreen = () => {
       });
       return;
     }
+
+    // Validate all required fields
     if (
       !full_name ||
-      !nick_name ||
+      !bio ||
       !date_of_birth ||
+      !gender ||
       !email ||
-      !phone_number ||
-      !gender
+      !phoneNumber
     ) {
       setError({
         error: true,
@@ -147,35 +167,54 @@ const EditProfileScreen = () => {
       return;
     }
 
-    interface Updates {
-      full_name: string | undefined;
-      nick_name: string | undefined;
-      date_of_birth: string | undefined;
-      gender: string | undefined;
-      email?: string | undefined;
-      phone_number?: string | undefined;
-    }
-
-    const updates: Updates = {
-      full_name: full_name,
-      nick_name: nick_name,
-      date_of_birth: date_of_birth?.toISOString(),
-      gender: gender,
-      email: email,
-      phone_number: phone_number,
-    };
-
-    const { data, error: err } = await supabase.auth.updateUser({
-      data: updates,
+    // Update profile in profiles table
+    const { error: profileError } = await supabase.from("profiles").upsert({
+      id: userData?.userData?.id,
+      full_name,
+      bio,
+      date_of_birth: date_of_birth.toISOString().split("T")[0],
+      gender,
+      updated_at: new Date().toISOString(),
     });
 
-    if (err) {
+    if (profileError) {
       setError({
         error: true,
-        message: err.message,
+        message: profileError.message,
       });
       return;
     }
+
+    // Update email if changed
+    if (email !== initialEmail) {
+      const { error: emailError } = await supabase.auth.updateUser({
+        email: email,
+      });
+
+      if (emailError) {
+        setError({
+          error: true,
+          message: emailError.message,
+        });
+        return;
+      }
+    }
+
+    // Update phone number if changed
+    if (phoneNumber !== initialPhoneNumber) {
+      const { error: phoneError } = await supabase.auth.updateUser({
+        data: { phone_number: phoneNumber },
+      });
+
+      if (phoneError) {
+        setError({
+          error: true,
+          message: phoneError.message,
+        });
+        return;
+      }
+    }
+
     setSuccess({
       success: true,
       message: "Profile updated successfully",
@@ -184,171 +223,191 @@ const EditProfileScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ModalComponent
-        title={error.title}
-        message={error.message}
-        visible={error.error}
-        type="error"
-        onClose={() => setError({ error: false, message: "" })}
-      />
-      <ModalComponent
-        title={success.title}
-        message={success.message}
-        visible={success.success}
-        type="confirmation"
-        confirmText={"Done"}
-        onConfirm={() => {
-          setSuccess({ success: false, message: "" });
-          userData?.refreshUserData();
-          goToTheLastPage();
-        }}
-      />
-      <View style={styles.header}>
-        <Ionicons
-          name="arrow-back"
-          size={24}
-          color="black"
-          style={styles.backIcon}
-          onPress={goToTheLastPage}
-        />
-        <Text style={styles.title}>Edit Profile</Text>
-      </View>
-      <View style={styles.topSection}>
-        <View style={styles.profilePicContainer}>
-          <Placeholder
-            width={width * 0.3}
-            height={width * 0.3}
-            borderRadius={(width * 0.3) / 2}
-          />
-          <View style={styles.editIconContainer}>
-            <Ionicons
-              name="camera-outline"
-              size={16}
-              color="white"
-              style={styles.editIcon}
-            />
-          </View>
-        </View>
-      </View>
-      <View style={styles.bottomSection}>
-        <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Full Name"
-              style={styles.input}
-              onChangeText={(text) => setFull_name(text)}
-              value={full_name}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Nick Name"
-              style={styles.input}
-              onChangeText={(text) => setNick_name(text)}
-              value={nick_name}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="calendar-outline"
-              size={24}
-              color="gray"
-              style={styles.icon}
-            />
-            <TouchableOpacity
-              onPress={showDatepicker}
-              style={{ flex: 1, height: 52, justifyContent: "center" }}
-            >
-              <Text style={{ color: date_of_birth ? "black" : "gray" }}>
-                {date_of_birth
-                  ? date_of_birth.toLocaleDateString()
-                  : "Date of Birth"}
-              </Text>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date_of_birth || new Date()}
-                mode="date"
-                display="default"
-                onChange={onChange}
-              />
-            )}
-          </View>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="mail-outline"
-              size={24}
-              color="gray"
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="Email"
-              style={styles.input}
-              keyboardType="email-address"
-              onChangeText={(text) => setEmail(text)}
-              value={email}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="call-outline"
-              size={24}
-              color="gray"
-              style={styles.icon}
-            />
-            <TextInput
-              placeholder="(+91) 987 654 3210"
-              style={styles.input}
-              onChangeText={(text) => setPhone_number(text)}
-              value={phone_number}
-            />
-          </View>
-          <View style={styles.inputContainer}>
-            <Picker
-              selectedValue={gender}
-              style={styles.picker}
-              onValueChange={(itemValue: any, itemIndex: any) =>
-                setGender(itemValue)
-              }
-            >
-              <Picker.Item
-                label="Gender"
-                value={undefined}
-                color="gray"
-                style={{ fontSize: 16 }}
-              />
-              <Picker.Item label="Male" value="male" style={{ fontSize: 16 }} />
-              <Picker.Item
-                label="Female"
-                value="female"
-                style={{ fontSize: 16 }}
-              />
-              <Picker.Item
-                label="Other"
-                value="other"
-                style={{ fontSize: 16 }}
-              />
-            </Picker>
-          </View>
-        </View>
-        <OpacityButton
-          onPress={updateUserDetails}
-          style={styles.continueButton}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.buttonContent}>
-            <Text style={styles.continueButtonText}>Update</Text>
-            <View style={styles.continueButtonNextIconContainer}>
-              <Ionicons
-                name="arrow-forward"
-                size={24}
-                color="white"
-                style={styles.continueButtonNextIcon}
+          <ModalComponent
+            title={error.title}
+            message={error.message}
+            visible={error.error}
+            type="error"
+            onClose={() => setError({ error: false, message: "" })}
+          />
+          <ModalComponent
+            title={success.title}
+            message={success.message}
+            visible={success.success}
+            type="confirmation"
+            confirmText={"Done"}
+            onConfirm={() => {
+              setSuccess({ success: false, message: "" });
+              userData?.refreshUserData();
+              goToTheLastPage();
+            }}
+          />
+          <View style={styles.header}>
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={styles.backIcon}
+              onPress={goToTheLastPage}
+            />
+            <Text style={styles.title}>Edit Profile</Text>
+          </View>
+          <View style={styles.topSection}>
+            <View style={styles.profilePicContainer}>
+              <Placeholder
+                width={width * 0.3}
+                height={width * 0.3}
+                borderRadius={(width * 0.3) / 2}
               />
+              <View style={styles.editIconContainer}>
+                <Ionicons
+                  name="camera-outline"
+                  size={16}
+                  color="white"
+                  style={styles.editIcon}
+                />
+              </View>
             </View>
           </View>
-        </OpacityButton>
-      </View>
+          <View style={styles.bottomSection}>
+            <View style={styles.formContainer}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholder="Full Name"
+                  style={styles.input}
+                  onChangeText={(text) => setFull_name(text)}
+                  value={full_name}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholder="Bio"
+                  style={styles.input}
+                  onChangeText={(text) => setBio(text)}
+                  value={bio}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={24}
+                  color="gray"
+                  style={styles.icon}
+                />
+                <TouchableOpacity
+                  onPress={showDatepicker}
+                  style={{ flex: 1, height: 52, justifyContent: "center" }}
+                >
+                  <Text style={{ color: date_of_birth ? "black" : "gray" }}>
+                    {date_of_birth
+                      ? date_of_birth.toLocaleDateString()
+                      : "Date of Birth"}
+                  </Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date_of_birth || new Date()}
+                    mode="date"
+                    display="default"
+                    onChange={onChange}
+                  />
+                )}
+              </View>
+
+              {/* Add email input field */}
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="mail-outline"
+                  size={24}
+                  color="gray"
+                  style={styles.icon}
+                />
+                <TextInput
+                  placeholder="Email"
+                  style={styles.input}
+                  keyboardType="email-address"
+                  onChangeText={(text) => setEmail(text)}
+                  value={email}
+                />
+              </View>
+
+              {/* Add phone number input field */}
+              <View style={styles.inputContainer}>
+                <Ionicons
+                  name="call-outline"
+                  size={24}
+                  color="gray"
+                  style={styles.icon}
+                />
+                <TextInput
+                  placeholder="(+91) 987 654 3210"
+                  style={styles.input}
+                  onChangeText={(text) => setPhoneNumber(text)}
+                  value={phoneNumber}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Picker
+                  selectedValue={gender}
+                  style={styles.picker}
+                  onValueChange={(itemValue: any, itemIndex: any) =>
+                    setGender(itemValue)
+                  }
+                >
+                  <Picker.Item
+                    label="Gender"
+                    value={undefined}
+                    color="gray"
+                    style={{ fontSize: 16 }}
+                  />
+                  <Picker.Item
+                    label="Male"
+                    value="male"
+                    style={{ fontSize: 16 }}
+                  />
+                  <Picker.Item
+                    label="Female"
+                    value="female"
+                    style={{ fontSize: 16 }}
+                  />
+                  <Picker.Item
+                    label="Other"
+                    value="other"
+                    style={{ fontSize: 16 }}
+                  />
+                </Picker>
+              </View>
+            </View>
+            <OpacityButton
+              onPress={updateUserDetails}
+              style={styles.continueButton}
+            >
+              <View style={styles.buttonContent}>
+                <Text style={styles.continueButtonText}>Update</Text>
+                <View style={styles.continueButtonNextIconContainer}>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={24}
+                    color="white"
+                    style={styles.continueButtonNextIcon}
+                  />
+                </View>
+              </View>
+            </OpacityButton>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
