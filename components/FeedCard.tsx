@@ -14,7 +14,7 @@ interface FeedCardProps {
   content: string;
   likes: string;
   comments: string;
-  image?: ImageSourcePropType;
+  image?: string;
 }
 
 export const FeedCard = ({

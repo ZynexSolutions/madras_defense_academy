@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { OpacityButton } from "@/components/OpacityButton";
@@ -7,52 +7,39 @@ import { FeedCard } from "@/components/FeedCard";
 import BottomNavigationBar from "@/components/BottomNavigationBar";
 import { CustomIcon } from "@/components/CustomIcons";
 import { useRouter } from "expo-router";
-import { supabase } from "@/components/backend/supabase";
+import { getPosts } from "@/components/backend/getPosts";
+
+interface Post {
+  id: string;
+  content: string;
+  likes: number;
+  image_url: string | null;
+  created_at: string;
+  owner: {
+    id: string;
+    full_name: string;
+    image_url: string | null;
+  };
+  comments_count: number;
+}
 
 export default function FeedsScreen() {
   const router = useRouter();
-
-  const cardData = [
-    {
-      accountName: "Account Name",
-      time: "1 hour ago",
-      content:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo vel mauris ac convallis. Pellentesque venenatis malesuada eros id accumsan. Sed vel mattis lorem, non facilisis sapien. Integer fringilla condimentum elit in luctus. Nunc auctor massa non tellus vestibulum tincidunt. Suspendisse ultrices quam egestas, lobortis ligula non, euismod magna. Nunc a risus ante. Aenean tincidunt, tortor et pellentesque accumsan, nibh",
-      likes: "95",
-      comments: "25",
-      image: require("../../assets/images/home/course.png"),
-    },
-    {
-      accountName: "Account Name",
-      time: "1 hour ago",
-      content: "Lorem Ipsum Dorea Islop",
-      likes: "95",
-      comments: "25",
-      image: require("../../assets/images/home/course.png"),
-    },
-    {
-      accountName: "Account Name",
-      time: "1 hour ago",
-      content: "Lorem Ipsum Dorea Islop",
-      likes: "95",
-      comments: "25",
-      image: require("../../assets/images/home/course.png"),
-    },
-  ];
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [skip, setSkip] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.from("posts").select(`
-          auth.users (
-            raw_user_meta_data
-          )
-        `);
-      if (error) {
-        console.log(error);
+    const fetchPosts = async () => {
+      try {
+        const postsData = await getPosts(skip);
+        setPosts(postsData || []);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
       }
-      console.log("here is the data: ", data);
-    })();
-  }, []);
+    };
+
+    fetchPosts();
+  }, [skip]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -73,8 +60,19 @@ export default function FeedsScreen() {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          {cardData.map((card, index) => (
-            <FeedCard key={index} {...card} />
+          {posts.map((post) => (
+            <FeedCard
+              key={post.id}
+              accountName={post.owner.full_name}
+              time={new Date(post.created_at).toLocaleString()}
+              content={post.content}
+              likes={post.likes?.toString() || "0"}
+              comments={post.comments_count.toString()}
+              image={
+                "https://hcdlifspwvasfwpnoujj.supabase.co/storage/v1/object/public/post-images/" +
+                post.image_url
+              }
+            />
           ))}
         </View>
         <View style={{ height: 54 }} />

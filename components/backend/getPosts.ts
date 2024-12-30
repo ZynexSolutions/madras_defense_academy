@@ -7,10 +7,11 @@ export async function getPosts(skip: number = 0) {
             *,
             owner:profiles (
                 id,
-                username,
-                avatar_url
-            )      
-        `)
+                full_name,
+                image_url
+            ),
+            comments_count: comments (count)      
+        `, {count: 'exact'})
         .range(skip, skip + 9);
 
 
@@ -18,5 +19,13 @@ export async function getPosts(skip: number = 0) {
         throw error;
     }
 
-    return data;
+    // Transform the data to extract the actual count
+    const transformedData = data?.map(post => ({
+        ...post,
+        comments_count: Array.isArray(post.comments_count) 
+            ? post.comments_count[0]?.count || 0 
+            : 0
+    }));
+
+    return transformedData;
 }
